@@ -1,0 +1,26 @@
+#app {
+  width: 600px;
+  margin: 60px auto;
+}
+
+h2 {
+  display: flex;
+  justify-content: center;
+}
+
+#header {
+  display: flex;
+  justify-content: center;
+}
+
+#todoinput {
+  width: 100%;
+}
+
+#todolist {
+  margin: 60px auto;
+}
+
+.done {
+  text-decoration: line-through;
+}
