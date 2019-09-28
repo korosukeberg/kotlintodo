@@ -7,4 +7,6 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class TodoService (private val todoRepository: TodoRepository) {
     fun findAll() = todoRepository.findAll()
+    fun save(todo:ToDo) = todoRepository.save(todo)
+    fun delete(ids: List<Long>) = todoRepository.deleteByIdIn(ids)
 }
