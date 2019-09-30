@@ -1,22 +1,10 @@
 <template>
   <v-app>
     <v-container id="container">
-      <v-img
-        :src="require('./assets/logo.svg')"
-        class="my-3"
-        contain
-        height="200"
-      ></v-img>
-      <v-text-field
-        label="Solo"
-        placeholder="Add your todo here"
-        solo
-        @keyup.enter="add"
-        v-model="newItemTitle"
-        class="my-4"
-      >
+      <v-img :src="require('./assets/logo.svg')" class="my-3" contain height="200"></v-img>
+      <v-text-field placeholder="Add your todo here" solo @keyup.enter="add" v-model="newItemTitle" class="my-4">
         <template v-slot:append>
-          <v-btn class="ma-2" tile color="primary" @click="add">ADD</v-btn>
+          <v-btn tile color="primary" @click="add">ADD</v-btn>
         </template>
       </v-text-field>
 
@@ -25,7 +13,7 @@
         <v-btn text small color="error" @click.stop="openClearAllDialog">CLEAR ALL</v-btn>
         <v-dialog v-model="dialog" max-width="290">
           <v-card>
-            <v-card-title class="headline">Are you sure you want to clear all your todo?</v-card-title>
+            <v-card-title>Are you sure you want to clear all your todo?</v-card-title>
             <v-card-actions>
               <div class="flex-grow-1"></div>
               <v-btn color="blue darken-1" text @click="dialog = false">CANCEL</v-btn>
@@ -35,41 +23,30 @@
         </v-dialog>
       </v-layout>
 
-
       <v-list two-line flat>
         <v-card>
           <v-list-item-group multiple>
             <template v-for="(item, index) in items">
               <v-list-item>
-
-                <v-list-item-action @click="markCompleted(item)">
+                <v-list-item-action @click="toggleCompleted(item)">
                   <v-checkbox v-model="item.completed" color="primary"></v-checkbox>
                 </v-list-item-action>
-
                 <v-list-item-content>
                   <v-list-item-title
                     v-bind:class="{'primary--text done': item.completed}">{{ item.title }}
                   </v-list-item-title>
                 </v-list-item-content>
-
                 <v-btn text icon color="red lighten-3" style="display: none" class="clear-btn"
                        @click="clear(item, index)">
                   <v-icon>mdi-close</v-icon>
                 </v-btn>
-
               </v-list-item>
-              <v-divider
-                v-if="index + 1 < items.length"
-                :key="index"
-              ></v-divider>
+              <v-divider v-if="index + 1 < items.length" :key="index"></v-divider>
             </template>
           </v-list-item-group>
         </v-card>
       </v-list>
-
-
       <!-- <HelloWorld/> -->
-
     </v-container>
   </v-app>
 </template>
@@ -126,7 +103,7 @@
           console.log(error);
         });
       },
-      markCompleted: function (completedItem) {
+      toggleCompleted: function (completedItem) {
         axios.post("/todo" + "/" + completedItem.id, {completed: completedItem.completed})
       },
       clear: function (item, index) {
