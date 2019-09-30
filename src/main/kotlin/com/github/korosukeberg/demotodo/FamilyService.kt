@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-class FamilyService (private val familyRepository: FamilyRepository) {
+class FamilyService(private val familyRepository: FamilyRepository) {
     fun findAll() = familyRepository.findAll()
     fun findOne(id: Long) = familyRepository.findById(id)
 }
