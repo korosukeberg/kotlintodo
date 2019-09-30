@@ -1,72 +1,72 @@
 <template>
     <v-app>
+        <v-container id="container">
+            <v-img
+                    :src="require('./assets/logo.svg')"
+                    class="my-3"
+                    contain
+                    height="200"
+            ></v-img>
+            <v-text-field
+                    label="Solo"
+                    placeholder="Add your todo here"
+                    solo
+                    @keyup.enter="add"
+                    v-model="newItemTitle"
+                    class="my-4"
+            >
+                <template v-slot:append>
+                    <v-btn class="ma-2" tile color="primary" @click="add">ADD</v-btn>
+                </template>
+            </v-text-field>
+
+            <v-layout justify-end>
+                <v-btn text small color="warning" @click="clearCompleted">CLEAR COMPLETED</v-btn>
+                <v-btn text small color="error" @click.stop="openClearAllDialog">CLEAR ALL</v-btn>
+                <v-dialog v-model="dialog" max-width="290">
+                    <v-card>
+                        <v-card-title class="headline">Are you sure you want to clear all your todo?</v-card-title>
+                        <v-card-actions>
+                            <div class="flex-grow-1"></div>
+                            <v-btn color="blue darken-1" text @click="dialog = false">CANCEL</v-btn>
+                            <v-btn color="blue darken-1" text @click="clearAll">OK</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+            </v-layout>
 
 
-        <v-content>
-            <v-container>
-                <v-layout
-                        wrap
-                >
-                    <v-flex xs12>
-                        <v-img
-                                :src="require('./assets/logo.svg')"
-                                class="my-3"
-                                contain
-                                height="200"
-                        ></v-img>
-                    </v-flex>
+            <v-list two-line flat>
+                <v-card>
+                    <v-list-item-group multiple>
 
-                    <v-flex>
-                        <v-layout>
-                            <v-text-field
-                                    label="Solo"
-                                    placeholder="Add your todo here"
-                                    solo
-                                    v-on:keyup.enter="add"
-                                    v-model="newItemTitle"
-                            >
-                                <template v-slot:append>
-                                    <v-btn class="ma-2" tile color="primary" v-on:click="add">ADD</v-btn>
-                                </template>
-                            </v-text-field>
-                        </v-layout>
-                        <v-layout justify-end>
-                            <v-btn text small color="warning" v-on:click="clearCompleted">CLEAR COMPLETED
-                            </v-btn>
-                            <v-btn text small color="error" v-on:click="clearAll">CLEAR ALL</v-btn>
-                        </v-layout>
-                    </v-flex>
+                        <v-list-item v-for="(item, index) in items">
+                            <template>
+                                <v-list-item-action @click="markCompleted(item)">
+                                    <v-checkbox v-model="item.completed" color="primary"></v-checkbox>
+                                </v-list-item-action>
 
-                    <v-flex xs12>
-                        <v-card max-width="475" class="mx-auto">
-                            <v-list subheader two-line flat>
-                                <v-list-item-group multiple>
-                                    <v-list-item v-for="item in items">
-                                        <template>
-                                            <v-list-item-action>
-                                                <v-checkbox
-                                                        v-model="item.isCompleted"
-                                                        color="primary"
-                                                ></v-checkbox>
-                                            </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title
+                                            v-bind:class="{'primary--text done': item.completed}">{{ item.title }}
+                                    </v-list-item-title>
+                                </v-list-item-content>
 
-                                            <v-list-item-content>
-                                                <v-list-item-title
-                                                        v-bind:class="{'primary--text done': item.isCompleted}">{{
-                                                    item.title }}
-                                                </v-list-item-title>
-                                            </v-list-item-content>
-                                        </template>
-                                    </v-list-item>
-                                </v-list-item-group>
-                            </v-list>
-                        </v-card>
-                    </v-flex>
+                                <v-btn text icon color="red lighten-3" style="display: none" class="clear-btn"
+                                       @click="clear(item, index)">
+                                    <v-icon>mdi-close</v-icon>
+                                </v-btn>
+                            </template>
+                        </v-list-item>
 
-                    <!-- <HelloWorld/> -->
-                </v-layout>
-            </v-container>
-        </v-content>
+                    </v-list-item-group>
+                </v-card>
+            </v-list>
+
+
+            <!-- <HelloWorld/> -->
+
+        </v-container>
     </v-app>
 </template>
 
@@ -86,7 +86,8 @@
         data: function () {
             return {
                 newItemTitle: "",
-                items: []
+                items: [],
+                dialog: false,
             }
         },
         mounted: function () {
@@ -94,7 +95,12 @@
         },
         methods: {
             load: function () {
-                axios.get("/todo").then((response) => {
+                axios.get("/todo").then(response => {
+                    response.data.sort(function (a, b) {
+                        if (a.id < b.id) return -1;
+                        if (a.id > b.id) return 1;
+                        return 0;
+                    });
                     for (let i = 0; i < response.data.length; i++) {
                         this.items.push(response.data[i])
                     }
@@ -107,7 +113,7 @@
                 let newItem = {
                     id: this.items.length ? this.items.reduce((a, b) => a.id > b.id ? a : b).id + 1 : 1,
                     title: this.newItemTitle,
-                    isCompleted: false
+                    completed: false
                 }
                 axios.post("/todo", newItem).then(response => {
                     this.items.push(newItem);
@@ -116,10 +122,18 @@
                     console.log(error);
                 });
             },
+            markCompleted: function (completedItem) {
+                axios.post("/todo" + "/" + completedItem.id, {completed: completedItem.completed})
+            },
+            clear: function (item, index) {
+                axios.delete("/todo", {data: [item.id]}).then(response => {
+                    this.items.splice(index--, 1)
+                })
+            },
             clearCompleted: function () {
                 let completedItems = [];
                 for (let i = 0; i < this.items.length; i++) {
-                    if (this.items[i].isCompleted) {
+                    if (this.items[i].completed) {
                         completedItems.push(this.items[i].id)
                         this.items.splice(i--, 1);
                     }
@@ -139,9 +153,14 @@
                 })
                 axios.delete("/todo", {data: itemIds}).then(response => {
                     this.items = [];
+                    this.dialog = false;
                 }, error => {
                     console.log(error);
                 });
+            },
+            openClearAllDialog: function () {
+                if (!this.items.length) return;
+                this.dialog = true;
             }
         }
     }
@@ -149,6 +168,14 @@
 <style>
     .done {
         text-decoration: line-through;
+    }
+
+    #container {
+        max-width: 550px;
+    }
+
+    .v-list-item:hover .clear-btn {
+        display: block !important;
     }
 
 </style>

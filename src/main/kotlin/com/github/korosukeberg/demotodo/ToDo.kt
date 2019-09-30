@@ -1,14 +1,14 @@
 package com.github.korosukeberg.demotodo
 
-import javax.persistence.*
+import javax.persistence.Entity
+import javax.persistence.Id
+import javax.persistence.Table
 
 @Entity
-@Table(name="todo")
+@Table(name = "todo")
 data class ToDo(
-        @Id
-        @GeneratedValue
-        val id: Long = -1,
-        val title: String = "",
-        @Column(name="iscompleted")
-        val isCompleted: Boolean = false
+    @Id
+    var id: Long = -1,
+    var title: String = "",
+    var completed: Boolean = false
 ) {}
