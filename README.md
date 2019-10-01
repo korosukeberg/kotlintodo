@@ -1,2 +1,18 @@
 # todo-app-kotlin-vue
-A Simple todo application with vue.js/vuetify.js frontend and Kotlin/PostgreSQL backend
+A simple ToDo application
+
+## Frontend
+- Renders html with Vue components
+- Sends CRUD requests to backend web API via axios
+
+- JavaScript
+- Vue.js
+- Vuetify.js
+- axios https://github.com/axios/axios
+
+## Backend
+- Accepts CRUD requests and manages data in PostgreSQL
+
+- Kotlin
+- Spring Boot
+- PostgreSQL
