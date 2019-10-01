@@ -8,7 +8,7 @@ A simple ToDo application
   - JavaScript
   - Vue.js
   - Vuetify.js
-  - axios https://github.com/axios/axios
+  - [axios](https://github.com/axios/axios)
 
 ## Backend
 - Respond to CRUD requests and manages data in PostgreSQL  
