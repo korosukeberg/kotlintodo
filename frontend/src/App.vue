@@ -8,6 +8,10 @@
         </template>
       </v-text-field>
 
+      <custominput>
+        <template v-slot:buttonlabel>I'm called from parent vue</template>
+      </custominput>
+
       <v-layout justify-end>
         <v-btn text small color="warning" @click="clearCompleted">CLEAR COMPLETED</v-btn>
         <v-btn text small color="error" @click.stop="openClearAllDialog">CLEAR ALL</v-btn>
@@ -54,6 +58,7 @@
 <script>
   import HelloWorld from './components/HelloWorld';
   import axiosBase from "axios"
+  import custominput from './components/custominput';
 
   const axios = axiosBase.create({
     baseURL: "http://localhost:8081"
@@ -63,6 +68,7 @@
     name: 'App',
     components: {
       HelloWorld,
+      custominput,
     },
     data: function () {
       return {
