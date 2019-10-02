@@ -27,7 +27,7 @@
         </v-dialog>
       </v-layout>
 
-      <v-list two-line flat>
+      <v-list two-line flat class="pa-0">
         <v-card>
           <v-list-item-group multiple>
             <template v-for="(item, index) in items">
