@@ -45,7 +45,7 @@
                   <v-icon>mdi-close</v-icon>
                 </v-btn>
               </v-list-item>
-              <v-divider v-if="index + 1 < items.length" :key="index"></v-divider>
+              <v-divider></v-divider>
             </template>
           </v-list-item-group>
         </v-card>
@@ -129,10 +129,9 @@
           return
         }
         axios.delete("/todo", {data: completedItems}).then(response => {
-          }
-          , error => {
-            console.log(error);
-          });
+        }, error => {
+          console.log(error);
+        });
       },
       clearAll: function () {
         let itemIds = this.items.map(value => {
