@@ -151,17 +151,18 @@
     }
   }
 </script>
-<style>
-  .done {
-    text-decoration: line-through;
-  }
-
+<style lang="scss">
   #container {
     max-width: 550px;
   }
 
-  .v-list-item:hover .clear-btn {
-    display: block !important;
+  .done {
+    text-decoration: line-through;
   }
 
+  .v-list-item:hover {
+    .clear-btn {
+      display: block !important;
+    }
+  }
 </style>
