@@ -2,7 +2,7 @@
   <v-app>
     <v-container id="container">
       <v-img :src="require('./assets/logo.svg')" class="my-3" contain height="200"></v-img>
-      <v-text-field placeholder="What do you need to do?" solo @keyup.enter="add" v-model="newItemTitle" class="my-4">
+      <v-text-field placeholder="What do you need to do?" solo @keydown.enter="add" v-model="newItemTitle" class="my-4">
         <template v-slot:append>
           <v-btn tile color="primary" @click="add">ADD</v-btn>
         </template>
