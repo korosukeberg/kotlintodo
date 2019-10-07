@@ -12,7 +12,7 @@
         <template v-slot:buttonlabel>I'm called from parent vue</template>
       </custominput>
 
-      <v-layout justify-end>
+      <v-layout justify-end v-show="this.items.length">
         <v-btn text small color="warning" @click="clearCompleted">CLEAR COMPLETED</v-btn>
         <v-btn text small color="error" @click="openClearAllDialog">CLEAR ALL</v-btn>
         <v-dialog v-model="dialog" max-width="290">
