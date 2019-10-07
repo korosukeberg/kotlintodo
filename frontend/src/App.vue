@@ -14,7 +14,7 @@
 
       <v-layout justify-end>
         <v-btn text small color="warning" @click="clearCompleted">CLEAR COMPLETED</v-btn>
-        <v-btn text small color="error" @click.stop="openClearAllDialog">CLEAR ALL</v-btn>
+        <v-btn text small color="error" @click="openClearAllDialog">CLEAR ALL</v-btn>
         <v-dialog v-model="dialog" max-width="290">
           <v-card>
             <v-card-title>Are you sure you want to clear all your todo?</v-card-title>
