@@ -97,10 +97,11 @@
         axios.post("/todo", newItem).then(() => {
           this.items.push(newItem);
           this.newItemTitle = "";
-          this.processing = false;
         }).catch(error => {
           console.log(error);
-        });
+        }).finally(() => {
+          this.processing = false;
+        })
       },
       toggleCompleted: function (completedItem) {
         axios.post("/todo" + "/" + completedItem.id, {completed: completedItem.completed})
