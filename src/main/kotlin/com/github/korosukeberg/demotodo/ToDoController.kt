@@ -19,13 +19,7 @@ import javax.servlet.Filter
 
 @Controller
 @RequestMapping
-class ToDoController(private val familyService: FamilyService, private val todoService: TodoService) {
-
-    @GetMapping("/family")
-    @ResponseBody
-    fun getAllFamilies(): List<Family> {
-        return familyService.findAll()
-    }
+class ToDoController(private val todoService: TodoService) {
 
     @GetMapping("/todo")
     @ResponseBody
@@ -38,24 +32,20 @@ class ToDoController(private val familyService: FamilyService, private val todoS
         return todoService.save(todo)
     }
 
-    @PostMapping("/todo/{id}")
-    fun markCompleted(@PathVariable(value = "id") id: Long, @RequestBody todo: ToDo) {
-        todoService.markCompleted(id, todo)
-    }
-
     @DeleteMapping("/todo")
     fun deleteToDo(@RequestBody ids: List<Long>) {
         todoService.delete(ids)
     }
 
+    @PostMapping("/todo/{id}")
+    fun markCompleted(@PathVariable(value = "id") id: Long, @RequestBody todo: ToDo) {
+        todoService.markCompleted(id, todo)
+    }
+
+    //Vue.js and Bootstrap todolist
     @RequestMapping("/")
     fun getTodoHtml(): String {
         return "todo"
-    }
-
-    @RequestMapping("/index")
-    fun getIndexHtml(): String {
-        return "index"
     }
 
     @Bean
