@@ -4,7 +4,7 @@
       <v-img :src="require('./assets/logo.svg')" class="my-3" contain height="200"></v-img>
       <v-text-field placeholder="What do you need to do?" solo @keydown.enter="add" v-model="newItemTitle" class="my-4">
         <template v-slot:append>
-          <v-btn tile color="primary" @click="add">ADD</v-btn>
+          <v-btn tile color="primary" @click="add" :disabled="processing">ADD</v-btn>
         </template>
       </v-text-field>
 
@@ -65,6 +65,7 @@
         newItemTitle: "",
         items: [],
         dialog: false,
+        processing: false,
       }
     },
     mounted: function () {
@@ -87,6 +88,7 @@
         if (!this.newItemTitle) {
           return;
         }
+        this.processing = true;
         let newItem = {
           id: this.items.length ? this.items.reduce((a, b) => a.id > b.id ? a : b).id + 1 : 1,
           title: this.newItemTitle,
@@ -95,6 +97,7 @@
         axios.post("/todo", newItem).then(() => {
           this.items.push(newItem);
           this.newItemTitle = "";
+          this.processing = false;
         }).catch(error => {
           console.log(error);
         });
