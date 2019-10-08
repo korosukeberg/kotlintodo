@@ -8,10 +8,6 @@
         </template>
       </v-text-field>
 
-      <custominput>
-        <template v-slot:buttonlabel>I'm called from parent vue</template>
-      </custominput>
-
       <v-layout justify-end v-show="this.items.length">
         <v-btn text small color="warning" @click="clearCompleted">CLEAR COMPLETED</v-btn>
         <v-btn text small color="error" @click="openClearAllDialog">CLEAR ALL</v-btn>
@@ -50,15 +46,12 @@
           </v-list-item-group>
         </v-card>
       </v-list>
-      <!-- <HelloWorld/> -->
     </v-container>
   </v-app>
 </template>
 
 <script>
-  import HelloWorld from './components/HelloWorld';
   import axiosBase from "axios"
-  import custominput from './components/custominput';
 
   const axios = axiosBase.create({
     baseURL: "http://localhost:8081"
@@ -66,10 +59,7 @@
 
   export default {
     name: 'App',
-    components: {
-      HelloWorld,
-      custominput,
-    },
+    components: {},
     data: function () {
       return {
         newItemTitle: "",
@@ -102,10 +92,10 @@
           title: this.newItemTitle,
           completed: false
         }
-        axios.post("/todo", newItem).then(response => {
+        axios.post("/todo", newItem).then(() => {
           this.items.push(newItem);
           this.newItemTitle = "";
-        }, error => {
+        }).catch(error => {
           console.log(error);
         });
       },
@@ -113,7 +103,7 @@
         axios.post("/todo" + "/" + completedItem.id, {completed: completedItem.completed})
       },
       clear: function (item, index) {
-        axios.delete("/todo", {data: [item.id]}).then(response => {
+        axios.delete("/todo", {data: [item.id]}).then(() => {
           this.items.splice(index--, 1)
         })
       },
@@ -128,8 +118,7 @@
         if (!completedItems.length) {
           return
         }
-        axios.delete("/todo", {data: completedItems}).then(response => {
-        }, error => {
+        axios.delete("/todo", {data: completedItems}).catch(error => {
           console.log(error);
         });
       },
@@ -137,10 +126,10 @@
         let itemIds = this.items.map(value => {
           return value.id
         })
-        axios.delete("/todo", {data: itemIds}).then(response => {
+        axios.delete("/todo", {data: itemIds}).then(() => {
           this.items = [];
           this.dialog = false;
-        }, error => {
+        }).catch(error => {
           console.log(error);
         });
       },
