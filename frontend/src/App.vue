@@ -4,14 +4,14 @@
       <v-img :src="require('./assets/logo.svg')" class="my-3" contain height="200"></v-img>
       <v-text-field placeholder="What do you need to do?" solo @keydown.enter="add" v-model="newItemTitle" class="my-4">
         <template v-slot:append>
-          <v-btn tile color="primary" @click="add" :disabled="processing">ADD</v-btn>
+          <v-btn tile color="primary" @click="add">ADD</v-btn>
         </template>
       </v-text-field>
 
       <v-layout justify-end v-show="this.items.length">
         <v-btn text small color="warning" @click="clearCompleted">CLEAR COMPLETED</v-btn>
         <v-btn text small color="error" @click="openClearAllDialog">CLEAR ALL</v-btn>
-        <v-dialog v-model="dialog" max-width="290">
+        <v-dialog v-model="clearAllDialog" max-width="290">
           <v-card>
             <v-card-title>Are you sure you want to clear all your todo?</v-card-title>
             <v-card-actions>
@@ -26,7 +26,7 @@
       <v-list two-line flat class="pa-0">
         <v-card>
           <v-list-item-group multiple>
-            <template v-for="(item, index) in items">
+            <div v-for="(item, index) in items" :key="item.id">
               <v-list-item>
                 <v-list-item-action @click="toggleCompleted(item)">
                   <v-checkbox v-model="item.completed" color="primary"></v-checkbox>
@@ -42,11 +42,16 @@
                 </v-btn>
               </v-list-item>
               <v-divider></v-divider>
-            </template>
+            </div>
           </v-list-item-group>
         </v-card>
       </v-list>
     </v-container>
+
+    <v-snackbar v-model="snackbar" :color="snackbarColor" :bottom="true" :right="true" :timeout=6000>
+      {{ snackbarText }}
+      <v-btn dark text @click="snackbar = false">Close</v-btn>
+    </v-snackbar>
   </v-app>
 </template>
 
@@ -64,8 +69,11 @@
       return {
         newItemTitle: "",
         items: [],
-        dialog: false,
-        processing: false,
+        clearAllDialog: false,
+        isProcessing: false,
+        snackbar: false,
+        snackbarText: "Something went wrong",
+        snackbarColor: "red",
       }
     },
     mounted: function () {
@@ -85,10 +93,10 @@
         })
       },
       add: function () {
-        if (!this.newItemTitle) {
-          return;
-        }
-        this.processing = true;
+        if (!this.newItemTitle) return;
+        if (this.isProcessing) return;
+
+        this.isProcessing = true;
         let newItem = {
           id: this.items.length ? this.items.reduce((a, b) => a.id > b.id ? a : b).id + 1 : 1,
           title: this.newItemTitle,
@@ -97,10 +105,10 @@
         axios.post("/todo", newItem).then(() => {
           this.items.push(newItem);
           this.newItemTitle = "";
-        }).catch(error => {
-          console.log(error);
+        }).catch(() => {
+          this.snackbar = true;
         }).finally(() => {
-          this.processing = false;
+          this.isProcessing = false;
         })
       },
       toggleCompleted: function (completedItem) {
@@ -122,8 +130,8 @@
         if (!completedItems.length) {
           return
         }
-        axios.delete("/todo", {data: completedItems}).catch(error => {
-          console.log(error);
+        axios.delete("/todo", {data: completedItems}).catch(() => {
+          this.snackbar = true;
         });
       },
       clearAll: function () {
@@ -132,14 +140,14 @@
         })
         axios.delete("/todo", {data: itemIds}).then(() => {
           this.items = [];
-          this.dialog = false;
-        }).catch(error => {
-          console.log(error);
+          this.clearAllDialog = false;
+        }).catch(() => {
+          this.snackbar = true;
         });
       },
       openClearAllDialog: function () {
         if (!this.items.length) return;
-        this.dialog = true;
+        this.clearAllDialog = true;
       }
     }
   }
