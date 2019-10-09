@@ -16,7 +16,7 @@
             <v-card-title>Are you sure you want to clear all your todo?</v-card-title>
             <v-card-actions>
               <div class="flex-grow-1"></div>
-              <v-btn color="blue darken-1" text @click="dialog = false">CANCEL</v-btn>
+              <v-btn color="blue darken-1" text @click="clearAllDialog = false">CANCEL</v-btn>
               <v-btn color="blue darken-1" text @click="clearAll">OK</v-btn>
             </v-card-actions>
           </v-card>
