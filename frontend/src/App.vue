@@ -118,17 +118,10 @@
         })
       },
       clearCompleted: function () {
-        let completedItems = [];
-        for (let i = 0; i < this.items.length; i++) {
-          if (this.items[i].completed) {
-            completedItems.push(this.items[i].id)
-            this.items.splice(i--, 1);
-          }
-        }
-        if (!completedItems.length) {
-          return
-        }
-        axios.delete("/todo/completed").catch(() => {
+        axios.delete("/todo/completed").then(() => {
+          this.items = [];
+          this.load();
+        }).catch(() => {
           this.showErrorSnackbar();
         });
       },
