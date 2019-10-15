@@ -48,9 +48,9 @@
       </v-list>
     </v-container>
 
-    <v-snackbar v-model="snackbar" :color="snackbarColor" :bottom="true" :right="true" :timeout=6000>
-      {{ snackbarText }}
-      <v-btn dark text @click="snackbar = false">Close</v-btn>
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :bottom="true" :right="true" :timeout=6000>
+      {{ snackbar.text }}
+      <v-btn dark text @click="snackbar.show = false">Close</v-btn>
     </v-snackbar>
   </v-app>
 </template>
@@ -71,9 +71,11 @@
         items: [],
         clearAllDialog: false,
         isProcessing: false,
-        snackbar: false,
-        snackbarText: "Something went wrong",
-        snackbarColor: "red",
+        snackbar: {
+          show: false,
+          text: "Something went wrong",
+          color: "red"
+        },
       }
     },
     mounted: function () {
@@ -83,9 +85,7 @@
       load: function () {
         axios.get("/todo").then(response => {
           if (!response.data.length) {
-            this.snackbarText = "Congratulations!  You are all done now.";
-            this.snackbarColor = "success";
-            this.snackbar = true;
+            this.showNoTodoSnackbar();
             return;
           }
           for (let i = 0; i < response.data.length; i++) {
@@ -102,7 +102,7 @@
           this.items.push(response.data);
           this.newItemTitle = "";
         }).catch(() => {
-          this.snackbar = true;
+          this.showErrorSnackbar();
         }).finally(() => {
           this.isProcessing = false;
         })
@@ -113,6 +113,8 @@
       clear: function (item, index) {
         axios.delete("/todo", {data: [item.id]}).then(() => {
           this.items.splice(index--, 1)
+        }).catch(() => {
+          this.showErrorSnackbar();
         })
       },
       clearCompleted: function () {
@@ -126,15 +128,15 @@
         if (!completedItems.length) {
           return
         }
-        axios.delete("/todo", {data: completedItems}).catch(() => {
-          this.snackbar = true;
+        axios.delete("/todo/completed").catch(() => {
+          this.showErrorSnackbar();
         });
       },
       clearAll: function () {
         axios.delete("/todo").then(() => {
           this.items = [];
         }).catch(() => {
-          this.snackbar = true;
+          this.showErrorSnackbar();
         }).finally(() => {
           this.clearAllDialog = false;
         })
@@ -142,6 +144,16 @@
       openClearAllDialog: function () {
         if (!this.items.length) return;
         this.clearAllDialog = true;
+      },
+      showNoTodoSnackbar: function () {
+        this.snackbar.text = "Congratulations!  You are all done now.";
+        this.snackbar.color = "success";
+        this.snackbar.show = true;
+      },
+      showErrorSnackbar: function () {
+        this.snackbar.text = "Something went wrong.";
+        this.snackbar.color = "red";
+        this.snackbar.show = true;
       }
     }
   }
