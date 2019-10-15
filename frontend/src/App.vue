@@ -97,13 +97,8 @@
         if (this.isProcessing) return;
 
         this.isProcessing = true;
-        let newItem = {
-          id: this.items.length ? this.items.reduce((a, b) => a.id > b.id ? a : b).id + 1 : 1,
-          title: this.newItemTitle,
-          completed: false
-        }
-        axios.post("/todo", newItem).then(() => {
-          this.items.push(newItem);
+        axios.post("/todo", {title: this.newItemTitle}).then(response => {
+          this.items.push(response.data);
           this.newItemTitle = "";
         }).catch(() => {
           this.snackbar = true;

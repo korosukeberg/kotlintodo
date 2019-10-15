@@ -3,7 +3,7 @@ package com.github.korosukeberg.demotodo
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.core.Ordered
-import org.springframework.stereotype.Controller
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.filter.CorsFilter
 import java.util.Collections
 import javax.servlet.Filter
 
-@Controller
-@RequestMapping
+@RestController
 class ToDoController(private val todoService: TodoService) {
 
     @GetMapping("/todo")
@@ -28,8 +28,8 @@ class ToDoController(private val todoService: TodoService) {
     }
 
     @PostMapping("/todo")
-    fun saveToDo(@RequestBody todo: ToDo): ToDo {
-        return todoService.save(todo)
+    fun saveToDo(@RequestBody todo: ToDo): ResponseEntity<ToDo> {
+        return ResponseEntity.ok(todoService.save(todo))
     }
 
     @DeleteMapping("/todo")

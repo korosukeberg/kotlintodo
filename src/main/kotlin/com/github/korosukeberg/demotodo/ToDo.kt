@@ -1,5 +1,6 @@
 package com.github.korosukeberg.demotodo
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -16,5 +17,6 @@ data class ToDo(
     var title: String = "",
     var completed: Boolean = false,
     @Column(name = "createddate")
+    @JsonIgnore
     var createdDate: LocalDateTime = LocalDateTime.now()
 ) {}
