@@ -82,11 +82,12 @@
     methods: {
       load: function () {
         axios.get("/todo").then(response => {
-          response.data.sort(function (a, b) {
-            if (a.id < b.id) return -1;
-            if (a.id > b.id) return 1;
-            return 0;
-          });
+          if (!response.data.length) {
+            this.snackbarText = "Congratulations!  You are all done now.";
+            this.snackbarColor = "success";
+            this.snackbar = true;
+            return;
+          }
           for (let i = 0; i < response.data.length; i++) {
             this.items.push(response.data[i])
           }
@@ -107,7 +108,7 @@
         })
       },
       toggleCompleted: function (completedItem) {
-        axios.post("/todo" + "/" + completedItem.id, {completed: completedItem.completed})
+        axios.put("/todo" + "/" + completedItem.id, {completed: completedItem.completed})
       },
       clear: function (item, index) {
         axios.delete("/todo", {data: [item.id]}).then(() => {
@@ -130,15 +131,13 @@
         });
       },
       clearAll: function () {
-        let itemIds = this.items.map(value => {
-          return value.id
-        })
-        axios.delete("/todo", {data: itemIds}).then(() => {
+        axios.delete("/todo").then(() => {
           this.items = [];
-          this.clearAllDialog = false;
         }).catch(() => {
           this.snackbar = true;
-        });
+        }).finally(() => {
+          this.clearAllDialog = false;
+        })
       },
       openClearAllDialog: function () {
         if (!this.items.length) return;
