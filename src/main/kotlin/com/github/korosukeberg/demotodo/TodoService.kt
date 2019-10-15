@@ -8,8 +8,10 @@ import org.springframework.transaction.annotation.Transactional
 class TodoService(private val todoRepository: TodoRepository) {
     fun findAll() = todoRepository.findAllByOrderByIdAsc()
     fun save(todo: ToDo) = todoRepository.save(todo)
-    fun delete(ids: List<Long>) = todoRepository.deleteByIdIn(ids)
-    fun markCompleted(id: Long, todo: ToDo) {
+    fun delete(id: Long) = todoRepository.deleteById(id)
+    fun deleteCompleted() = todoRepository.deleteCompleted()
+    fun deleteAll() = todoRepository.deleteAll()
+    fun toggleCompleted(id: Long, todo: ToDo) {
         var todoToUpdate: ToDo = todoRepository.getOne(id)
         todoToUpdate.completed = todo.completed
         todoRepository.save(todoToUpdate)

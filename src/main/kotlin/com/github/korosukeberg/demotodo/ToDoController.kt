@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -22,23 +23,33 @@ import javax.servlet.Filter
 class ToDoController(private val todoService: TodoService) {
 
     @GetMapping
-    fun getTodos(): List<ToDo> {
+    fun getAll(): List<ToDo> {
         return todoService.findAll()
     }
 
     @PostMapping
-    fun saveToDo(@RequestBody todo: ToDo): ResponseEntity<ToDo> {
+    fun save(@RequestBody todo: ToDo): ResponseEntity<ToDo> {
         return ResponseEntity.ok(todoService.save(todo))
     }
 
-    @DeleteMapping
-    fun deleteToDo(@RequestBody ids: List<Long>) {
-        todoService.delete(ids)
+    @DeleteMapping("/{id}")
+    fun delete(@PathVariable id: Long) {
+        todoService.delete(id)
     }
 
-    @PostMapping("/{id}")
-    fun markCompleted(@PathVariable(value = "id") id: Long, @RequestBody todo: ToDo) {
-        todoService.markCompleted(id, todo)
+    @DeleteMapping("/completed")
+    fun deleteCompleted() {
+        todoService.deleteCompleted()
+    }
+
+    @DeleteMapping
+    fun deleteAll() {
+        return todoService.deleteAll()
+    }
+
+    @PutMapping("/{id}")
+    fun toggleCompleted(@PathVariable(value = "id") id: Long, @RequestBody todo: ToDo) {
+        todoService.toggleCompleted(id, todo)
     }
 
     //Vue.js and Bootstrap todolist

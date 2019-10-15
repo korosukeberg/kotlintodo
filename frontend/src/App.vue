@@ -107,11 +107,11 @@
           this.isProcessing = false;
         })
       },
-      toggleCompleted: function (completedItem) {
-        axios.put("/todo" + "/" + completedItem.id, {completed: completedItem.completed})
+      toggleCompleted: function (toggled) {
+        axios.put("/todo" + "/" + toggled.id, {completed: toggled.completed})
       },
       clear: function (item, index) {
-        axios.delete("/todo", {data: [item.id]}).then(() => {
+        axios.delete("/todo" + "/" + item.id).then(() => {
           this.items.splice(index--, 1)
         }).catch(() => {
           this.showErrorSnackbar();
