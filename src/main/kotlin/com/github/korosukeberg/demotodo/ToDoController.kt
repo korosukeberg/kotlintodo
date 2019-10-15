@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
@@ -19,25 +18,25 @@ import java.util.Collections
 import javax.servlet.Filter
 
 @RestController
+@RequestMapping("/todo")
 class ToDoController(private val todoService: TodoService) {
 
-    @GetMapping("/todo")
-    @ResponseBody
+    @GetMapping
     fun getTodos(): List<ToDo> {
         return todoService.findAll()
     }
 
-    @PostMapping("/todo")
+    @PostMapping
     fun saveToDo(@RequestBody todo: ToDo): ResponseEntity<ToDo> {
         return ResponseEntity.ok(todoService.save(todo))
     }
 
-    @DeleteMapping("/todo")
+    @DeleteMapping
     fun deleteToDo(@RequestBody ids: List<Long>) {
         todoService.delete(ids)
     }
 
-    @PostMapping("/todo/{id}")
+    @PostMapping("/{id}")
     fun markCompleted(@PathVariable(value = "id") id: Long, @RequestBody todo: ToDo) {
         todoService.markCompleted(id, todo)
     }
