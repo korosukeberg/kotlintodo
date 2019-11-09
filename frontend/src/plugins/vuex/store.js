@@ -4,19 +4,27 @@ import Vuex from 'vuex';
 Vue.use(Vuex);
 
 const state = {
-  isProcessing: false,
   items: [],
+  snackbar: {
+    show: false,
+    text: "Something went wrong",
+    color: "red"
+  }
 }
 
 const mutations = {
-  beginProcessing() {
-    this.state.isProcessing = true;
-  },
-  endProcessing() {
-    this.state.isProcessing = false;
-  },
   clearItems() {
     this.state.items = [];
+  },
+  showNoTodoSnackbar() {
+    this.state.snackbar.text = "Congratulations!  You are all done now.";
+    this.state.snackbar.color = "success";
+    this.state.snackbar.show = true;
+  },
+  showErrorSnackbar() {
+    this.state.snackbar.text = "Something went wrong.";
+    this.state.snackbar.color = "red";
+    this.state.snackbar.show = true;
   }
 }
 

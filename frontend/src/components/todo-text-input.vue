@@ -12,25 +12,26 @@
 
   export default {
     data: () => ({
-      newItemTitle: ""
+      newItemTitle: "",
+      isProcessing: false
     }),
     computed: {
-      ...mapState(["isProcessing", "items"])
+      ...mapState(["items"])
     },
     methods: {
-      ...mapMutations(["beginProcessing", "endProcessing"]),
+      ...mapMutations(["showErrorSnackbar"]),
       add: function () {
         if (!this.newItemTitle) return;
         if (this.isProcessing) return;
 
-        this.beginProcessing();
+        this.isProcessing = true;
         axios.post("/todo", {title: this.newItemTitle}).then(response => {
           this.items.push(response.data);
           this.newItemTitle = "";
         }).catch(() => {
           this.showErrorSnackbar();
         }).finally(() => {
-          this.endProcessing();
+          this.isProcessing = false;
         })
       },
     }

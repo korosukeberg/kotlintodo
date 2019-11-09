@@ -3,29 +3,13 @@
     <v-container id="container">
       <v-img :src="require('./assets/logo.svg')" class="my-3" contain height="200"></v-img>
       <todo-text-input></todo-text-input>
-
-      <v-layout justify-end v-show="this.items.length">
-        <v-btn text small color="warning" @click="clearCompleted">CLEAR COMPLETED</v-btn>
-        <v-btn text small color="error" @click="openClearAllDialog">CLEAR ALL</v-btn>
-        <v-dialog v-model="clearAllDialog" max-width="290">
-          <v-card>
-            <v-card-title>Are you sure you want to clear all your todo?</v-card-title>
-            <v-card-actions>
-              <div class="flex-grow-1"></div>
-              <v-btn color="blue darken-1" text @click="clearAllDialog = false">CANCEL</v-btn>
-              <v-btn color="blue darken-1" text @click="clearAll">OK</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </v-layout>
-
+      <todo-subactions @loadToDos="load"></todo-subactions>
       <todo-list></todo-list>
-
     </v-container>
 
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :bottom="true" :right="true" :timeout=6000>
-      {{ snackbar.text }}
-      <v-btn dark text @click="snackbar.show = false">Close</v-btn>
+    <v-snackbar v-model="this.snackbar.show" :color="this.snackbar.color" :bottom="true" :right="true" :timeout=6000>
+      {{ this.snackbar.text }}
+      <v-btn dark text @click="this.snackbar.show = false">Close</v-btn>
     </v-snackbar>
   </v-app>
 </template>
@@ -34,32 +18,27 @@
   import axios from "./plugins/axiosbase";
   import TodoTextInput from "./components/todo-text-input"
   import TodoList from "./components/todo-list"
+  import TodoSubactions from "./components/todo-subactions"
   import {mapMutations, mapState} from "vuex";
 
   export default {
     name: 'App',
     components: {
       TodoTextInput,
+      TodoSubactions,
       TodoList
     },
     data: function () {
-      return {
-        clearAllDialog: false,
-        snackbar: {
-          show: false,
-          text: "Something went wrong",
-          color: "red"
-        },
-      }
+      return {}
     },
     mounted: function () {
       this.load();
     },
     computed: {
-      ...mapState(["items"])
+      ...mapState(["items", "snackbar"])
     },
     methods: {
-      ...mapMutations(["clearItems"]),
+      ...mapMutations(["clearItems", "showNoTodoSnackbar", "showErrorSnackbar"]),
       load: function () {
         axios.get("/todo").then(response => {
           if (!response.data.length) {
@@ -70,38 +49,6 @@
             this.items.push(response.data[i])
           }
         })
-      },
-      clearCompleted: function () {
-        axios.delete("/todo/completed").then(() => {
-          this.clearItems();
-          this.load();
-        }).catch(() => {
-          this.showErrorSnackbar();
-        });
-      },
-      clearAll: function () {
-        axios.delete("/todo").then(() => {
-          this.clearItems();
-          this.showNoTodoSnackbar();
-        }).catch(() => {
-          this.showErrorSnackbar();
-        }).finally(() => {
-          this.clearAllDialog = false;
-        })
-      },
-      openClearAllDialog: function () {
-        if (!this.items.length) return;
-        this.clearAllDialog = true;
-      },
-      showNoTodoSnackbar: function () {
-        this.snackbar.text = "Congratulations!  You are all done now.";
-        this.snackbar.color = "success";
-        this.snackbar.show = true;
-      },
-      showErrorSnackbar: function () {
-        this.snackbar.text = "Something went wrong.";
-        this.snackbar.color = "red";
-        this.snackbar.show = true;
       }
     }
   }
