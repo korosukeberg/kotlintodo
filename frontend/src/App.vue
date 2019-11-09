@@ -54,7 +54,7 @@
 <script>
   import axios from "./plugins/axiosbase";
   import TodoTextInput from "./components/todo-text-input"
-  import {mapState} from "vuex";
+  import {mapMutations, mapState} from "vuex";
 
   export default {
     name: 'App',
@@ -63,7 +63,6 @@
     },
     data: function () {
       return {
-        //items: [],
         clearAllDialog: false,
         snackbar: {
           show: false,
@@ -79,6 +78,7 @@
       ...mapState(["items"])
     },
     methods: {
+      ...mapMutations(["clearItems"]),
       load: function () {
         axios.get("/todo").then(response => {
           if (!response.data.length) {
@@ -102,7 +102,7 @@
       },
       clearCompleted: function () {
         axios.delete("/todo/completed").then(() => {
-          this.items = [];
+          this.clearItems();
           this.load();
         }).catch(() => {
           this.showErrorSnackbar();
@@ -110,7 +110,7 @@
       },
       clearAll: function () {
         axios.delete("/todo").then(() => {
-          this.items = [];
+          this.clearItems();
           this.showNoTodoSnackbar();
         }).catch(() => {
           this.showErrorSnackbar();

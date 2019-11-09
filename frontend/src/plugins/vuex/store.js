@@ -9,11 +9,14 @@ const state = {
 }
 
 const mutations = {
-  beginProcessing(isProcessing) {
-    isProcessing = true;
+  beginProcessing() {
+    this.state.isProcessing = true;
   },
-  endProcessing(isProcessing) {
-    isProcessing = false;
+  endProcessing() {
+    this.state.isProcessing = false;
+  },
+  clearItems() {
+    this.state.items = [];
   }
 }
 
