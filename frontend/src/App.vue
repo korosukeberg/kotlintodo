@@ -2,11 +2,7 @@
   <v-app>
     <v-container id="container">
       <v-img :src="require('./assets/logo.svg')" class="my-3" contain height="200"></v-img>
-      <v-text-field placeholder="What do you need to do?" solo @keydown.enter="add" v-model="newItemTitle" class="my-4">
-        <template v-slot:append>
-          <v-btn tile color="primary" @click="add">ADD</v-btn>
-        </template>
-      </v-text-field>
+      <todo-text-input></todo-text-input>
 
       <v-layout justify-end v-show="this.items.length">
         <v-btn text small color="warning" @click="clearCompleted">CLEAR COMPLETED</v-btn>
@@ -56,21 +52,19 @@
 </template>
 
 <script>
-  import axiosBase from "axios"
-
-  const axios = axiosBase.create({
-    baseURL: "http://localhost:8081"
-  })
+  import axios from "./plugins/axiosbase";
+  import TodoTextInput from "./components/todo-text-input"
+  import {mapState} from "vuex";
 
   export default {
     name: 'App',
-    components: {},
+    components: {
+      TodoTextInput
+    },
     data: function () {
       return {
-        newItemTitle: "",
-        items: [],
+        //items: [],
         clearAllDialog: false,
-        isProcessing: false,
         snackbar: {
           show: false,
           text: "Something went wrong",
@@ -80,6 +74,9 @@
     },
     mounted: function () {
       this.load();
+    },
+    computed: {
+      ...mapState(["items"])
     },
     methods: {
       load: function () {
@@ -91,20 +88,6 @@
           for (let i = 0; i < response.data.length; i++) {
             this.items.push(response.data[i])
           }
-        })
-      },
-      add: function () {
-        if (!this.newItemTitle) return;
-        if (this.isProcessing) return;
-
-        this.isProcessing = true;
-        axios.post("/todo", {title: this.newItemTitle}).then(response => {
-          this.items.push(response.data);
-          this.newItemTitle = "";
-        }).catch(() => {
-          this.showErrorSnackbar();
-        }).finally(() => {
-          this.isProcessing = false;
         })
       },
       toggleCompleted: function (toggled) {
@@ -128,6 +111,7 @@
       clearAll: function () {
         axios.delete("/todo").then(() => {
           this.items = [];
+          this.showNoTodoSnackbar();
         }).catch(() => {
           this.showErrorSnackbar();
         }).finally(() => {
