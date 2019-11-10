@@ -25,6 +25,9 @@ const mutations = {
     this.state.snackbar.text = "Something went wrong.";
     this.state.snackbar.color = "red";
     this.state.snackbar.show = true;
+  },
+  closeSnackbar() {
+    this.state.snackbar.show = false;
   }
 }
 

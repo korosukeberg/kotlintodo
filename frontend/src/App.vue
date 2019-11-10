@@ -9,7 +9,7 @@
 
     <v-snackbar v-model="this.snackbar.show" :color="this.snackbar.color" :bottom="true" :right="true" :timeout=6000>
       {{ this.snackbar.text }}
-      <v-btn dark text @click="this.snackbar.show = false">Close</v-btn>
+      <v-btn dark text @click="close">Close</v-btn>
     </v-snackbar>
   </v-app>
 </template>
@@ -38,7 +38,7 @@
       ...mapState(["items", "snackbar"])
     },
     methods: {
-      ...mapMutations(["clearItems", "showNoTodoSnackbar", "showErrorSnackbar"]),
+      ...mapMutations(["clearItems", "showNoTodoSnackbar", "showErrorSnackbar", "closeSnackbar"]),
       load: function () {
         axios.get("/todo").then(response => {
           if (!response.data.length) {
@@ -49,6 +49,9 @@
             this.items.push(response.data[i])
           }
         })
+      },
+      close: function () {
+        this.closeSnackbar();
       }
     }
   }
