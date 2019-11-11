@@ -2,86 +2,43 @@
   <v-app>
     <v-container id="container">
       <v-img :src="require('./assets/logo.svg')" class="my-3" contain height="200"></v-img>
-      <v-text-field placeholder="What do you need to do?" solo @keydown.enter="add" v-model="newItemTitle" class="my-4">
-        <template v-slot:append>
-          <v-btn tile color="primary" @click="add">ADD</v-btn>
-        </template>
-      </v-text-field>
-
-      <v-layout justify-end v-show="this.items.length">
-        <v-btn text small color="warning" @click="clearCompleted">CLEAR COMPLETED</v-btn>
-        <v-btn text small color="error" @click="openClearAllDialog">CLEAR ALL</v-btn>
-        <v-dialog v-model="clearAllDialog" max-width="290">
-          <v-card>
-            <v-card-title>Are you sure you want to clear all your todo?</v-card-title>
-            <v-card-actions>
-              <div class="flex-grow-1"></div>
-              <v-btn color="blue darken-1" text @click="clearAllDialog = false">CANCEL</v-btn>
-              <v-btn color="blue darken-1" text @click="clearAll">OK</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </v-layout>
-
-      <v-list two-line flat class="pa-0">
-        <v-card>
-          <v-list-item-group multiple>
-            <div v-for="(item, index) in items" :key="item.id">
-              <v-list-item>
-                <v-list-item-action @click="toggleCompleted(item)">
-                  <v-checkbox v-model="item.completed" color="primary"></v-checkbox>
-                </v-list-item-action>
-                <v-list-item-content>
-                  <v-list-item-title
-                    v-bind:class="{'primary--text done': item.completed}">{{ item.title }}
-                  </v-list-item-title>
-                </v-list-item-content>
-                <v-btn text icon color="red lighten-3" style="display: none" class="clear-btn"
-                       @click="clear(item, index)">
-                  <v-icon>mdi-close</v-icon>
-                </v-btn>
-              </v-list-item>
-              <v-divider></v-divider>
-            </div>
-          </v-list-item-group>
-        </v-card>
-      </v-list>
+      <todo-text-input></todo-text-input>
+      <todo-subactions @loadToDos="load"></todo-subactions>
+      <todo-list></todo-list>
     </v-container>
 
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :bottom="true" :right="true" :timeout=6000>
-      {{ snackbar.text }}
-      <v-btn dark text @click="snackbar.show = false">Close</v-btn>
+    <v-snackbar v-model="this.snackbar.show" :color="this.snackbar.color" :bottom="true" :right="true" :timeout=6000>
+      {{ this.snackbar.text }}
+      <v-btn dark text @click="close">Close</v-btn>
     </v-snackbar>
   </v-app>
 </template>
 
 <script>
-  import axiosBase from "axios"
-
-  const axios = axiosBase.create({
-    baseURL: "http://localhost:8081"
-  })
+  import axios from "./plugins/axiosbase";
+  import TodoTextInput from "./components/todo-text-input"
+  import TodoList from "./components/todo-list"
+  import TodoSubactions from "./components/todo-subactions"
+  import {mapMutations, mapState} from "vuex";
 
   export default {
     name: 'App',
-    components: {},
+    components: {
+      TodoTextInput,
+      TodoSubactions,
+      TodoList
+    },
     data: function () {
-      return {
-        newItemTitle: "",
-        items: [],
-        clearAllDialog: false,
-        isProcessing: false,
-        snackbar: {
-          show: false,
-          text: "Something went wrong",
-          color: "red"
-        },
-      }
+      return {}
     },
     mounted: function () {
       this.load();
     },
+    computed: {
+      ...mapState(["items", "snackbar"])
+    },
     methods: {
+      ...mapMutations(["clearItems", "showNoTodoSnackbar", "showErrorSnackbar", "closeSnackbar"]),
       load: function () {
         axios.get("/todo").then(response => {
           if (!response.data.length) {
@@ -93,60 +50,8 @@
           }
         })
       },
-      add: function () {
-        if (!this.newItemTitle) return;
-        if (this.isProcessing) return;
-
-        this.isProcessing = true;
-        axios.post("/todo", {title: this.newItemTitle}).then(response => {
-          this.items.push(response.data);
-          this.newItemTitle = "";
-        }).catch(() => {
-          this.showErrorSnackbar();
-        }).finally(() => {
-          this.isProcessing = false;
-        })
-      },
-      toggleCompleted: function (toggled) {
-        axios.put("/todo" + "/" + toggled.id, {completed: toggled.completed})
-      },
-      clear: function (item, index) {
-        axios.delete("/todo" + "/" + item.id).then(() => {
-          this.items.splice(index--, 1)
-        }).catch(() => {
-          this.showErrorSnackbar();
-        })
-      },
-      clearCompleted: function () {
-        axios.delete("/todo/completed").then(() => {
-          this.items = [];
-          this.load();
-        }).catch(() => {
-          this.showErrorSnackbar();
-        });
-      },
-      clearAll: function () {
-        axios.delete("/todo").then(() => {
-          this.items = [];
-        }).catch(() => {
-          this.showErrorSnackbar();
-        }).finally(() => {
-          this.clearAllDialog = false;
-        })
-      },
-      openClearAllDialog: function () {
-        if (!this.items.length) return;
-        this.clearAllDialog = true;
-      },
-      showNoTodoSnackbar: function () {
-        this.snackbar.text = "Congratulations!  You are all done now.";
-        this.snackbar.color = "success";
-        this.snackbar.show = true;
-      },
-      showErrorSnackbar: function () {
-        this.snackbar.text = "Something went wrong.";
-        this.snackbar.color = "red";
-        this.snackbar.show = true;
+      close: function () {
+        this.closeSnackbar();
       }
     }
   }
